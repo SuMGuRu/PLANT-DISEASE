@@ -1,60 +1,39 @@
-import cv2
-import numpy as np
+import streamlit as st
 import tensorflow as tf
-import tensorflow_hub as hub
-from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
+import numpy as np
+import requests
 import os
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
+# Download VGG16 model weights if not already downloaded
+model_path = "vgg16_weights_tf_dim_ordering_tf_kernels.h5"
+if not os.path.exists(model_path):
+    url = "https://storage.googleapis.com/tensorflow/keras-applications/vgg16/vgg16_weights_tf_dim_ordering_tf_kernels.h5"
+    r = requests.get(url, allow_redirects=True)
+    open(model_path, 'wb').write(r.content)
 
-# Load the pre-trained model from TensorFlow Hub
-model_url = "https://tfhub.dev/google/imagenet/mobilenet_v2_130_224/classification/4"
-model = tf.keras.Sequential([hub.KerasLayer(model_url)])
+# Load the VGG16 model with pre-trained weights
+model = VGG16(weights=model_path)
 
-# Function to preprocess the image
-def preprocess_image(image):
-    image = cv2.resize(image, (224, 224))  # Resize to match the model's input size
-    image = np.asarray(image) / 255.0  # Normalize pixel values
-    return image
+# Function to predict the image class using the VGG16 model
+def predict_image(image_path, model):
+    img = image.load_img(image_path, target_size=(224, 224))
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+    preds = model.predict(x)
+    return decode_predictions(preds, top=3)[0]
 
-# Function to predict plant species
-def predict_plant_species(image):
-    image = preprocess_image(image)
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
-    predictions = model.predict(image)
-    return predictions
+# Streamlit app code
+st.title("VGG16 Image Classification")
+uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 
-# Route for home page
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# Route for processing the uploaded image
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(request.url)
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        image = cv2.imread(image_path)
-        predictions = predict_plant_species(image)
-        os.remove(image_path)  # Remove the uploaded image after processing
-        return str(predictions)
-    else:
-        return "Error: Invalid file format"
-
-# Function to check if file extension is allowed
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if uploaded_file is not None:
+    st.image(uploaded_file, caption='Uploaded Image.', use_column_width=True)
+    st.write("")
+    st.write("Classifying...")
+    labels = predict_image(uploaded_file, model)
+    for label in labels:
+        st.write(f"{label[1]}: {label[2]*100:.2f}%")

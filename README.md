@@ -12,13 +12,13 @@ This is a Python project that requires the following packages for installation.
 2. Clone this repository to your local machine.
 
    ```bash
-   git clone https://github.com/your_username/project_name.git
+   \git clone https://github.com/SuMGuRu/PLANT-DISEASE.git
    ```
 
 3. Navigate to the project directory.
 
    ```bash
-   cd project_name
+   cd PLANT-DISEASE
    ```
 
 4. Install the required packages using pip.
@@ -37,7 +37,8 @@ This is a Python project that requires the following packages for installation.
 
 ## Usage
 
-Describe how to use your project here.
+Run app.py
+python app.py
 ```
 
 You can save this content in a file named `README.md` at the root of your project directory. Replace "Project Name" with your actual project name and "your_username/project_name.git" with your repository URL if applicable.

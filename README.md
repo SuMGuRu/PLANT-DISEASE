@@ -7,21 +7,19 @@ This is a Python project that requires the following packages for installation.
 
 ## Installation
 
-1. Make sure you have Python installed. If not, download and install it from [python.org](https://www.python.org/downloads/).
-
-2. Clone this repository to your local machine.
+1. Clone this repository to your local machine.
 
    ```bash
-   \git clone https://github.com/SuMGuRu/PLANT-DISEASE.git
+   git clone https://github.com/SuMGuRu/PLANT-DISEASE.git
    ```
 
-3. Navigate to the project directory.
+2. Navigate to the project directory.
 
    ```bash
    cd PLANT-DISEASE
    ```
 
-4. Install the required packages using pip.
+3. Install the required packages using pip.
 
    ```bash
    pip install -r requirements.txt

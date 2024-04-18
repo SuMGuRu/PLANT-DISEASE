@@ -1,8 +1,7 @@
 Here's a sample `README.md` file that you can include in your Python project to guide users on how to install the required packages:
 
 ```markdown
-# Project Name
-
+# Plant-Disease
 This is a Python project that requires the following packages for installation.
 
 ## Installation
